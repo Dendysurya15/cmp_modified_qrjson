@@ -39,6 +39,7 @@ dependencies:
   path_provider: ^2.1.5
   qr_code_scanner_plus: ^2.0.10+1
   archive: ^4.0.7
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

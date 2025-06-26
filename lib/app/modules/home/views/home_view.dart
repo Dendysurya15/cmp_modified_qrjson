@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modified_qrjson/app/widgets/nested_qr_data_widget.dart';
 import 'package:modified_qrjson/app/widgets/qr_data_input_widget.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
 import '../controllers/home_controller.dart';
 
@@ -21,7 +22,7 @@ class HomeView extends GetView<HomeController> {
             () =>
                 controller.hasQRData.value
                     ? IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: const Icon(Icons.clear_all),
                       onPressed: controller.clearData,
                     )
                     : const SizedBox(),
@@ -147,7 +148,7 @@ class HomeView extends GetView<HomeController> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       child: ElevatedButton(
-        onPressed: controller.saveAllData,
+        onPressed: controller.generateNewQR,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
@@ -190,6 +191,118 @@ class HomeView extends GetView<HomeController> {
           Text(
             'Scan a QR code to see data here',
             style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQRCodeDisplay() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.purple.shade400, Colors.purple.shade600],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Column(
+              children: [
+                Icon(Icons.qr_code, color: Colors.white, size: 32),
+                SizedBox(height: 8),
+                Text(
+                  'Generated QR Code',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Scan this QR code with your app',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // QR Code
+          Expanded(
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: QrImageView(
+                  data: controller.qrCodeData.value,
+                  version: QrVersions.auto,
+                  size: 300.0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  errorCorrectionLevel: QrErrorCorrectLevel.H,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: controller.hideQRCode,
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Back to Edit'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Generate new QR with updated data
+                    controller.generateNewQR();
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Regenerate'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
