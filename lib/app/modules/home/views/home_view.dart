@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modified_qrjson/app/widgets/nested_qr_data_widget.dart';
 import 'package:modified_qrjson/app/widgets/qr_data_input_widget.dart';
-import '../controllers/home_controller.dart';
 import 'dart:convert';
+import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -21,7 +21,7 @@ class HomeView extends GetView<HomeController> {
             () =>
                 controller.hasQRData.value
                     ? IconButton(
-                      icon: const Icon(Icons.clear_all),
+                      icon: const Icon(Icons.delete),
                       onPressed: controller.clearData,
                     )
                     : const SizedBox(),
@@ -110,7 +110,6 @@ class HomeView extends GetView<HomeController> {
 
           // Check if this is nested JSON data
           if (_isNestedJson(value)) {
-            print("masuk sini gess");
             return NestedQRDataWidget(
               title: key,
               controller: controller.textControllers[key]!,
@@ -133,15 +132,12 @@ class HomeView extends GetView<HomeController> {
   bool _isNestedJson(String value) {
     try {
       if (value.trim().startsWith('{') && value.trim().endsWith('}')) {
-        print("masuk gess");
-        Map<String, dynamic> parsed = Map<String, dynamic>.from(
-          const JsonDecoder().convert(value),
-        );
-        print(parsed);
-        return parsed.isNotEmpty;
+        var decoded = jsonDecode(value.trim());
+        return decoded is Map && decoded.isNotEmpty;
       }
       return false;
     } catch (e) {
+      print("JSON decode error: $e");
       return false;
     }
   }
@@ -195,7 +191,6 @@ class HomeView extends GetView<HomeController> {
             'Scan a QR code to see data here',
             style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
           ),
-          const SizedBox(height: 40),
         ],
       ),
     );

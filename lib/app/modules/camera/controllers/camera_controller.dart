@@ -113,10 +113,18 @@ class CameraController extends GetxController {
               Map<String, String> extractedData = {};
 
               jsonMap.forEach((key, value) {
-                extractedData[key] = value.toString();
-                print(
-                  'Key: $key, Value: ${value.toString().substring(0, value.toString().length > 100 ? 100 : value.toString().length)}${value.toString().length > 100 ? '...' : ''}',
-                );
+                // Handle different value types properly
+                if (value is Map<String, dynamic>) {
+                  // Keep nested objects as proper JSON strings
+                  extractedData[key] = jsonEncode(value);
+                  print('Key: $key (nested), Value: ${jsonEncode(value)}');
+                } else {
+                  // Convert simple values to strings
+                  extractedData[key] = value.toString();
+                  print(
+                    'Key: $key (simple), Value: ${value.toString().substring(0, value.toString().length > 100 ? 100 : value.toString().length)}${value.toString().length > 100 ? '...' : ''}',
+                  );
+                }
               });
 
               print('=== EXTRACTED KEYS ===');
