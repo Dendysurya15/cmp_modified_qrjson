@@ -44,7 +44,9 @@ class CameraController extends GetxController {
     // Pause scanning to prevent multiple scans
     qrController?.pauseCamera();
 
-    // Process the QR data after 2 seconds
+    // Show processing immediately and wait 2 seconds
+    isProcessing.value = true;
+
     Future.delayed(const Duration(seconds: 2), () {
       processQRData(scanData.code ?? '');
       hasScanned.value = false;
@@ -174,7 +176,19 @@ class CameraController extends GetxController {
     disposeQR();
 
     // Navigate back with arguments
-    Get.offNamed(Routes.home, arguments: {'qr_data': qrData});
+    Get.offNamed(
+      Routes.home,
+      arguments: {
+        'qr_data': qrData,
+        'scan_timestamp': DateTime.now().millisecondsSinceEpoch,
+        'total_keys': qrData.length,
+      },
+    );
+
+    print('=== NAVIGATION ===');
+    print('Navigating to home with ${qrData.length} keys');
+    print('Arguments passed: qr_data, scan_timestamp, total_keys');
+    print('==================');
   }
 
   // Helper method to print long strings in chunks
