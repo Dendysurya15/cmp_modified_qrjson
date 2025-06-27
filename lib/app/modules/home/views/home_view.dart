@@ -13,30 +13,22 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QR Data Manager'),
+        title: const Text('Modified QR'),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFF5F8575),
         foregroundColor: Colors.white,
-        actions: [
-          Obx(
-            () =>
-                controller.hasQRData.value
-                    ? IconButton(
-                      icon: const Icon(Icons.clear_all),
-                      onPressed: controller.clearData,
-                    )
-                    : const SizedBox(),
-          ),
-        ],
       ),
       body: Obx(() => _buildBody()),
       floatingActionButton: Obx(
         () =>
             !controller.hasQRData.value
-                ? FloatingActionButton(
-                  onPressed: controller.goToCamera,
-                  backgroundColor: Colors.green,
-                  child: const Icon(Icons.camera_alt, color: Colors.white),
+                ? Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 20),
+                  child: FloatingActionButton(
+                    onPressed: controller.goToCamera,
+                    backgroundColor: Colors.green,
+                    child: const Icon(Icons.photo_camera, color: Colors.white),
+                  ),
                 )
                 : const SizedBox(),
       ),
@@ -66,7 +58,11 @@ class HomeView extends GetView<HomeController> {
     // Success State - Has QR Data
     if (controller.hasQRData.value) {
       return Column(
-        children: [_buildHeader(), _buildDataList(), _buildSaveButton()],
+        children: [
+          _buildHeader(),
+          _buildDataList(),
+          _buildActionButtons(),
+        ], // ✅ Changed to _buildActionButtons
       );
     }
 
@@ -98,7 +94,7 @@ class HomeView extends GetView<HomeController> {
             ),
           ),
           Text(
-            '${controller.qrDataMap.length} fields detected',
+            'Total ${controller.qrDataMap.length} key',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ],
@@ -148,31 +144,64 @@ class HomeView extends GetView<HomeController> {
     }
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildActionButtons() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      child: ElevatedButton(
-        onPressed: controller.generateNewQR,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save),
-            SizedBox(width: 8),
-            Text(
-              'Generate QR Code',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: controller.clearData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade600,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.delete_forever, size: 20),
+                  SizedBox(width: 4),
+                  Text(
+                    'Clear',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: ElevatedButton(
+              onPressed: controller.generateNewQR,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.qr_code_outlined),
+                  SizedBox(width: 8),
+                  Text(
+                    'Generate QR',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -182,7 +211,7 @@ class HomeView extends GetView<HomeController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.qr_code_scanner, size: 100, color: Colors.grey.shade400),
+          Icon(Icons.qr_code_2, size: 100, color: Colors.grey.shade400),
           const SizedBox(height: 20),
           Text(
             'No QR Data',
@@ -207,7 +236,6 @@ class HomeView extends GetView<HomeController> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -237,8 +265,6 @@ class HomeView extends GetView<HomeController> {
             ),
           ),
 
-          const SizedBox(height: 20),
-
           // QR Code with RepaintBoundary for capturing
           Expanded(
             child: Center(
@@ -257,14 +283,18 @@ class HomeView extends GetView<HomeController> {
                   ],
                 ),
                 child: RepaintBoundary(
-                  key: controller.qrKey, // Add key for capturing
-                  child: QrImageView(
-                    data: controller.qrCodeData.value,
-                    version: QrVersions.auto,
-                    size: 300.0,
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    errorCorrectionLevel: QrErrorCorrectLevel.H,
+                  key: controller.qrKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    color: Colors.white,
+                    child: QrImageView(
+                      data: controller.qrCodeData.value,
+                      version: QrVersions.auto,
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      errorCorrectionLevel: QrErrorCorrectLevel.L,
+                      semanticsLabel: 'QR Code with JSON data',
+                    ),
                   ),
                 ),
               ),
@@ -294,13 +324,11 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Action buttons row
               Row(
                 children: [
@@ -319,8 +347,6 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  
                 ],
               ),
             ],

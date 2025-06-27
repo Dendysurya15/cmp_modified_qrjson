@@ -16,7 +16,7 @@ class HomeController extends GetxController {
   final textControllers = <String, TextEditingController>{}.obs;
   final qrCodeData = ''.obs;
   final showQRCode = false.obs;
-  
+
   // Add GlobalKey for QR code widget
   final GlobalKey qrKey = GlobalKey();
 
@@ -212,93 +212,94 @@ class HomeController extends GetxController {
   }
 
   Future<void> saveQRToGallery() async {
-  print('=== SAVING QR TO GALLERY ===');
-  
-  // Chain the operations with proper dialog dismissal
-  _captureQRCode()
-    .then((imageBytes) async {
-      if (imageBytes == null) throw Exception('Failed to capture QR code image');
-      
-      // Save to temp file
-      Directory tempDir = await getTemporaryDirectory();
-      String fileName = 'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
-      String filePath = '${tempDir.path}/$fileName';
-      
-      File tempFile = File(filePath);
-      await tempFile.writeAsBytes(imageBytes);
-      
-      // Save to gallery
-      bool? success = await GallerySaver.saveImage(filePath);
-      
-      // Clean up
-      if (await tempFile.exists()) {
-        await tempFile.delete();
-      }
-      
-      if (success != true) throw Exception('Failed to save to gallery');
-      
-      return success;
-    })
-    .then((success) {
-      // Success - dismiss dialog and show success message
-      print("seharusnya dismiss bro ");
-      Get.back(); // Close dialog
-      Get.snackbar(
-        'Success',
-        'QR Code saved to gallery!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-      );
-      print('✅ QR Code saved successfully');
-    })
-    .catchError((error) {
-      // Error - dismiss dialog and show error
-      Get.back(); // Close dialog
-      print('❌ Error saving QR to gallery: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to save QR code. Please check storage permissions.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        duration: const Duration(seconds: 4),
-      );
-    });
-}
+    print('=== SAVING QR TO GALLERY ===');
+
+    // Chain the operations with proper dialog dismissal
+    _captureQRCode()
+        .then((imageBytes) async {
+          if (imageBytes == null)
+            throw Exception('Failed to capture QR code image');
+
+          // Save to temp file
+          Directory tempDir = await getTemporaryDirectory();
+          String fileName =
+              'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
+          String filePath = '${tempDir.path}/$fileName';
+
+          File tempFile = File(filePath);
+          await tempFile.writeAsBytes(imageBytes);
+
+          // Save to gallery
+          bool? success = await GallerySaver.saveImage(filePath);
+
+          // Clean up
+          if (await tempFile.exists()) {
+            await tempFile.delete();
+          }
+
+          if (success != true) throw Exception('Failed to save to gallery');
+
+          return success;
+        })
+        .then((success) {
+          // Success - dismiss dialog and show success message
+          print("seharusnya dismiss bro ");
+          Get.back(); // Close dialog
+          Get.snackbar(
+            'Success',
+            'QR Code saved to gallery!',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            icon: const Icon(Icons.check_circle, color: Colors.white),
+          );
+          print('✅ QR Code saved successfully');
+        })
+        .catchError((error) {
+          // Error - dismiss dialog and show error
+          Get.back(); // Close dialog
+          print('❌ Error saving QR to gallery: $error');
+          Get.snackbar(
+            'Error',
+            'Failed to save QR code. Please check storage permissions.',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 4),
+          );
+        });
+  }
 
   // Alternative method: Save to temporary directory and show path
-  
+
   // Method to share QR code or save with different approach
   Future<void> shareQRCode() async {
     try {
       print('=== PREPARING QR FOR SHARING ===');
-      
+
       // Show loading indicator
       Get.dialog(
-        const Center(
-          child: CircularProgressIndicator(),
-        ),
+        const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
 
       // Capture QR code as image
       Uint8List? imageBytes = await _captureQRCode();
-      
+
       if (imageBytes != null) {
         // Get temporary directory
         Directory tempDir = await getTemporaryDirectory();
-        
+
         // Create unique filename
-        String fileName = 'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
+        String fileName =
+            'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
         String filePath = '${tempDir.path}/$fileName';
-        
+
         // Write image to file
         File file = File(filePath);
         await file.writeAsBytes(imageBytes);
-        
+
         // Close loading dialog
         Get.back();
-        
+
         // Show success message with options
         Get.snackbar(
           'QR Code Ready',
@@ -307,7 +308,7 @@ class HomeController extends GetxController {
           colorText: Colors.white,
           duration: const Duration(seconds: 8),
         );
-        
+
         print('✅ QR Code ready for sharing at: $filePath');
       } else {
         Get.back(); // Close loading dialog
@@ -323,19 +324,21 @@ class HomeController extends GetxController {
         colorText: Colors.white,
       );
     }
-    
+
     print('=================================');
   }
 
   // Capture QR code widget as image
   Future<Uint8List?> _captureQRCode() async {
     try {
-      RenderRepaintBoundary boundary = 
+      RenderRepaintBoundary boundary =
           qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      
+
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      
+      ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
       return byteData?.buffer.asUint8List();
     } catch (e) {
       print('Error capturing QR code: $e');
@@ -362,10 +365,13 @@ class HomeController extends GetxController {
       }
 
       print('Step 1: Minifying JSON...');
+
+      print("ini json data $jsonData");
       // Minify JSON (remove unnecessary whitespace)
       Map<String, dynamic> jsonMap = jsonDecode(jsonData);
       String minifiedJson = jsonEncode(jsonMap);
 
+      print("minfiedjson $minifiedJson");
       if (minifiedJson == "{}") {
         throw Exception('Empty JSON detected');
       }
@@ -399,6 +405,8 @@ class HomeController extends GetxController {
       String secondHalf = base64Encoded.substring(midPoint);
 
       String finalQRData = firstHalf + halfJsonEncrypted + secondHalf;
+
+      print(finalQRData);
       print('Final QR data length: ${finalQRData.length}');
 
       return finalQRData;
@@ -421,8 +429,8 @@ class HomeController extends GetxController {
     textControllers.clear();
     hasQRData.value = false;
 
-     showQRCode.value = false;  // Hide QR code display
-  qrCodeData.value = ''; 
+    showQRCode.value = false; // Hide QR code display
+    qrCodeData.value = '';
 
     Get.snackbar(
       'Cleared',

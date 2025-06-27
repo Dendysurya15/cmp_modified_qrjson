@@ -36,8 +36,6 @@ class QRDataInputWidget extends StatelessWidget {
             // Title
             Row(
               children: [
-                Icon(_getIconForKey(title), color: Colors.blue, size: 20),
-                const SizedBox(width: 8),
                 Text(
                   title,
                   style: const TextStyle(
@@ -50,11 +48,17 @@ class QRDataInputWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Text Field
+            // ✅ MULTILINE Text Field
             TextField(
               controller: controller,
               onChanged: onChanged,
-              maxLines: _getMaxLinesForKey(title),
+              // ✅ KEY CHANGES FOR MULTILINE:
+              maxLines: null, // Allow unlimited lines
+              minLines: 1, // Start with 1 line
+              keyboardType:
+                  TextInputType.multiline, // Enable multiline keyboard
+              textInputAction: TextInputAction.done, // Show enter key
+
               decoration: InputDecoration(
                 hintText: 'Enter ${title.toLowerCase()} value...',
                 border: OutlineInputBorder(
@@ -69,13 +73,15 @@ class QRDataInputWidget extends StatelessWidget {
                 fillColor: Colors.grey.shade50,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
-                  vertical: 8,
+                  vertical: 16, // ✅ Increased vertical padding for multiline
                 ),
+                // ✅ Ensure the field expands properly
+                alignLabelWithHint: true,
               ),
               style: const TextStyle(fontSize: 14),
             ),
 
-            // Value preview for long values
+            // Character count info
             if (controller.text.length > 50) ...[
               const SizedBox(height: 8),
               Container(
@@ -109,30 +115,5 @@ class QRDataInputWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  IconData _getIconForKey(String key) {
-    switch (key.toLowerCase()) {
-      case 'username':
-        return Icons.person;
-      case 'nik':
-        return Icons.badge;
-      case 'tgl':
-        return Icons.date_range;
-      case 'kemandoran_id':
-        return Icons.location_on;
-      default:
-        if (key.startsWith('tph_')) {
-          return Icons.data_array;
-        }
-        return Icons.text_fields;
-    }
-  }
-
-  int _getMaxLinesForKey(String key) {
-    if (key.startsWith('tph_') || key == 'nik') {
-      return 5; // Multi-line for long data
-    }
-    return 1; // Single line for short data
   }
 }
