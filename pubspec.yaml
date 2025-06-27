@@ -42,6 +42,7 @@ dependencies:
   qr_flutter: ^4.1.0
   gallery_saver_plus:
   share_plus: ^11.0.0
+  package_info_plus:
 
 dev_dependencies:
   flutter_test:

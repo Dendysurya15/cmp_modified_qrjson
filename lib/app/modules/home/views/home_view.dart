@@ -5,6 +5,7 @@ import 'package:modified_qrjson/app/widgets/qr_data_input_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
 import '../controllers/home_controller.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -13,7 +14,15 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modified QR'),
+        title: FutureBuilder<PackageInfo>(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text('Modified QR - v${snapshot.data!.version}');
+            }
+            return const Text('Modified QR');
+          },
+        ),
         centerTitle: true,
         backgroundColor: Color(0xFF5F8575),
         foregroundColor: Colors.white,
