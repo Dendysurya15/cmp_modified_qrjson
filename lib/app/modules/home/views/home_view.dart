@@ -231,6 +231,8 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
+  // Updated _buildQRCodeDisplay method with Share button
+
   Widget _buildQRCodeDisplay() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -264,6 +266,8 @@ class HomeView extends GetView<HomeController> {
               ],
             ),
           ),
+
+          const SizedBox(height: 20),
 
           // QR Code with RepaintBoundary for capturing
           Expanded(
@@ -303,19 +307,39 @@ class HomeView extends GetView<HomeController> {
 
           const SizedBox(height: 20),
 
-          // Updated Buttons with Save to Gallery
+          // ✅ Updated Buttons with Save and Share
           Column(
             children: [
-              // Save to Gallery Button
+              // Save and Share buttons row
               Row(
                 children: [
+                  // Save to Gallery Button
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: controller.saveQRToGallery,
-                      icon: const Icon(Icons.save_alt),
-                      label: const Text('Save to Gallery'),
+                      icon: const Icon(Icons.save_alt, size: 20),
+                      label: const Text('Save'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // ✅ Share Button
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.shareQRCode,
+                      icon: const Icon(Icons.share, size: 20),
+                      label: const Text('Share'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -329,13 +353,13 @@ class HomeView extends GetView<HomeController> {
 
               const SizedBox(height: 12),
 
-              // Action buttons row
+              // Back to Edit button
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: controller.hideQRCode,
-                      icon: const Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back, size: 18),
                       label: const Text('Back to Edit'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade600,
