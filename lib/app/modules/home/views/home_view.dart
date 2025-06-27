@@ -58,6 +58,11 @@ class HomeView extends GetView<HomeController> {
       );
     }
 
+    // QR Code Display State
+    if (controller.showQRCode.value) {
+      return _buildQRCodeDisplay();
+    }
+
     // Success State - Has QR Data
     if (controller.hasQRData.value) {
       return Column(
@@ -163,7 +168,7 @@ class HomeView extends GetView<HomeController> {
             Icon(Icons.save),
             SizedBox(width: 8),
             Text(
-              'Save All Data',
+              'Generate QR Code',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
@@ -234,7 +239,7 @@ class HomeView extends GetView<HomeController> {
 
           const SizedBox(height: 20),
 
-          // QR Code
+          // QR Code with RepaintBoundary for capturing
           Expanded(
             child: Center(
               child: Container(
@@ -251,13 +256,16 @@ class HomeView extends GetView<HomeController> {
                     ),
                   ],
                 ),
-                child: QrImageView(
-                  data: controller.qrCodeData.value,
-                  version: QrVersions.auto,
-                  size: 300.0,
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  errorCorrectionLevel: QrErrorCorrectLevel.H,
+                child: RepaintBoundary(
+                  key: controller.qrKey, // Add key for capturing
+                  child: QrImageView(
+                    data: controller.qrCodeData.value,
+                    version: QrVersions.auto,
+                    size: 300.0,
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    errorCorrectionLevel: QrErrorCorrectLevel.H,
+                  ),
                 ),
               ),
             ),
@@ -265,42 +273,55 @@ class HomeView extends GetView<HomeController> {
 
           const SizedBox(height: 20),
 
-          // Buttons
-          Row(
+          // Updated Buttons with Save to Gallery
+          Column(
             children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: controller.hideQRCode,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back to Edit'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              // Save to Gallery Button
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.saveQRToGallery,
+                      icon: const Icon(Icons.save_alt),
+                      label: const Text('Save to Gallery'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Generate new QR with updated data
-                    controller.generateNewQR();
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Regenerate'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              
+              const SizedBox(height: 12),
+              
+              // Action buttons row
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.hideQRCode,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Back to Edit'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  
+                ],
               ),
             ],
           ),
